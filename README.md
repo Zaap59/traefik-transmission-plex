@@ -14,7 +14,7 @@ $ sudo vim /etc/hosts
 
 ## HOW IT'S WORK
 
-Pull the projet and move on directory:
+Clone the projet and move on directory:
 
 ````shell
 $ cd traefik-transmission-plex/
