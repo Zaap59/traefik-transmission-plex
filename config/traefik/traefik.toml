@@ -1,0 +1,18 @@
+defaultEntryPoints = ["http"]
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+
+[web]
+address = ":8080"
+[web.auth.basic]
+  users = ["admin:$apr1$d1eed1dB$PQ/95/m/2osDd/mJok.Xb1"]
+
+[retry]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "local.org"
+watch = true
+exposedbydefault = false

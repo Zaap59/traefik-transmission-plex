@@ -1,0 +1,71 @@
+version: '2'
+
+services:
+
+  traefik:
+    image: traefik:1.6-alpine
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./config/traefik/traefik.toml:/traefik.toml"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.frontend.rule=Host:traefik.local.org"
+      - "traefik.port=8080"
+
+  transmission:
+    image: linuxserver/transmission
+    restart: always
+    environment:
+      - TZ=Europe/Paris
+      - PGID=1001
+      - PUID=1001
+    ports:
+      - "51413:51413"
+      - "51413:51413/udp"
+    volumes:
+      - ./config/transmission:/config
+      - ./downloads:/downloads
+    mem_limit: 2G
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:transmission.local.org;"
+      - "traefik.backend=transmission"
+      - "traefik.port=9091"
+    depends_on:
+      - traefik
+
+  plex:
+    image: linuxserver/plex
+    restart: always
+    environment:
+      - TZ=Europe/Paris
+      - PGID=1001
+      - PUID=1001
+      - VERSION=latest
+    volumes:
+      - ./config/plex:/config
+      - ./downloads/movies:/data/movies
+      - ./downloads/tvshows:/data/tvshows
+    mem_limit: 2G
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:plex.local.org"
+      - "traefik.backend=plex"
+      - "traefik.port=32400"
+    depends_on:
+      - traefik
+
+networks:
+  traefik:
+    external:
+      name: traefik
